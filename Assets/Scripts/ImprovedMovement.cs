@@ -19,15 +19,7 @@ public class ImprovedMovement : Movement
     public float slideSpeed = 5;
     public float wallJumpLerp = 10;
     public float dashSpeed = 50;
-
-    //[Space]
-    //[Header("Booleans")]
-    //public bool canMove;
-    //public bool wallGrab;
-    //public bool wallJumped;
-    //public bool wallSlide;
-    //public bool isDashing;
-
+   
     [Space]
 
     private bool groundTouch;
@@ -66,7 +58,10 @@ public class ImprovedMovement : Movement
         anim.SetHorizontalMovement(x, y, rb.velocity.y);
 
         // Cant hit wall during up jump
-        coll.onWall = coll.onWall && rb.velocity.y <= 0;
+        if (coll.onWall && !Input.GetButton("Fire3") && rb.velocity.y > 0)
+        {
+            coll.onWall = false;
+        }
 
         if (coll.onWall && Input.GetButton("Fire3") && canMove)
         {
@@ -103,7 +98,7 @@ public class ImprovedMovement : Movement
             rb.gravityScale = 3;
         }
 
-        if(coll.onWall && !coll.onGround)
+        if (coll.onWall && !coll.onGround)
         {
             if (x != 0 && !wallGrab)
             {
@@ -120,7 +115,7 @@ public class ImprovedMovement : Movement
             anim.SetTrigger("jump");
 
             // Coyote Jump
-            if ((coll.onGround || Time.time < lastGrounded + 0.5f) && !hasJumped)
+            if ((coll.onGround || Time.time < lastGrounded + 1f) && !hasJumped)
             {
                 Jump(Vector2.up, false);
                 hasJumped = true;
@@ -190,6 +185,7 @@ public class ImprovedMovement : Movement
 
         anim.SetTrigger("dash");
 
+        // New Dash
         Vector2 dir = new Vector2(x, y);
         float speedX = dir.normalized.x * dashSpeed;
         float speedY = dir.normalized.y * dashSpeed/2;

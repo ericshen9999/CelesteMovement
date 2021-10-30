@@ -19,14 +19,6 @@ public class BaseMovement : Movement
     public float wallJumpLerp = 10;
     public float dashSpeed = 20;
 
-    //[Space]
-    //[Header("Booleans")]
-    //public bool canMove;
-    //public bool wallGrab;
-    //public bool wallJumped;
-    //public bool wallSlide;
-    //public bool isDashing;
-
     [Space]
 
     private bool groundTouch;
