@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System.Timers;
 
 public class ImprovedMovement : Movement
 {
@@ -31,6 +32,8 @@ public class ImprovedMovement : Movement
 
     private bool groundTouch;
     private bool hasDashed;
+    private bool hasJumped;
+    private float lastGrounded;
 
     public int side = 1;
 
@@ -47,6 +50,7 @@ public class ImprovedMovement : Movement
         coll = GetComponent<Collision>();
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponentInChildren<AnimationScript>();
+        lastGrounded = 0.0f;
     }
 
     // Update is called once per frame
@@ -62,7 +66,7 @@ public class ImprovedMovement : Movement
         anim.SetHorizontalMovement(x, y, rb.velocity.y);
 
         // Cant hit wall during up jump
-        coll.onWall = coll.onWall && rb.velocity.y < 0;
+        coll.onWall = coll.onWall && rb.velocity.y <= 0;
 
         if (coll.onWall && Input.GetButton("Fire3") && canMove)
         {
@@ -115,10 +119,17 @@ public class ImprovedMovement : Movement
         {
             anim.SetTrigger("jump");
 
-            if (coll.onGround)
+            // Coyote Jump
+            if ((coll.onGround || Time.time < lastGrounded + 0.5f) && !hasJumped)
+            {
                 Jump(Vector2.up, false);
-            if (coll.onWall && !coll.onGround)
+                hasJumped = true;
+            }
+            if (coll.onWall && !coll.onGround && !hasJumped)
+            {
                 WallJump();
+                hasJumped = true;
+            }
         }
 
         if (Input.GetButtonDown("Fire1") && !hasDashed)
@@ -131,6 +142,8 @@ public class ImprovedMovement : Movement
         {
             GroundTouch();
             groundTouch = true;
+            lastGrounded = Time.time;
+            hasJumped = false;
         }
 
         if(!coll.onGround && groundTouch)
