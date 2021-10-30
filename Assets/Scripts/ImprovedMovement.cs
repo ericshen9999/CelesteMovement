@@ -58,7 +58,7 @@ public class ImprovedMovement : Movement
         anim.SetHorizontalMovement(x, y, rb.velocity.y);
 
         // Cant hit wall during up jump
-        if (coll.onWall && !Input.GetButton("Fire3") && rb.velocity.y > 0)
+        if (coll.onWall && !Input.GetButton("Fire3") && rb.velocity.y >= 0)
         {
             coll.onWall = false;
         }
@@ -85,6 +85,7 @@ public class ImprovedMovement : Movement
         
         if (wallGrab && !isDashing)
         {
+            hasJumped = false;
             rb.gravityScale = 0;
             if(x > .2f || x < -.2f)
             rb.velocity = new Vector2(rb.velocity.x, 0);
@@ -102,6 +103,7 @@ public class ImprovedMovement : Movement
         {
             if (x != 0 && !wallGrab)
             {
+                hasJumped = false;
                 wallSlide = true;
                 WallSlide();
             }
@@ -115,7 +117,7 @@ public class ImprovedMovement : Movement
             anim.SetTrigger("jump");
 
             // Coyote Jump
-            if ((coll.onGround || Time.time < lastGrounded + 1f) && !hasJumped)
+            if ((coll.onGround || Time.time < lastGrounded + 1f) && !hasJumped && !coll.onWall)
             {
                 Jump(Vector2.up, false);
                 hasJumped = true;
